@@ -1,78 +1,69 @@
-<?php defined('DIR') OR exit; ?>
-<?php
-	if(isset($_POST['serialize'])){
-		$array = array(); 
+<?php 
+    defined('DIR') OR exit;
 
-		$params = array();
-		parse_str($_POST['serialize'], $params);
+    $out = array(
+        "Error" => array(
+            "Code"=>1, 
+            "Text"=>l("error"),
+            "Details"=>"",
+            "error_list"=>array()
+        ),
+        "Success"=>array(
+            "Code"=>0, 
+            "Text"=>"",
+            "Details"=>""
+        )
+    ); 
 
-		// echo "<pre>";
-		// print_r($params);
-		// echo "</pre>";
-		$message = "";
-		foreach ($params as $key => $value) {
-			if($key=="csrf"){
-				continue;
-			}
-			$message .= $key . ": " . $value. "\n\r";
-		}
-		
-		if(!isset($params['csrf']) || $_SESSION['csrf']!=$params['csrf']){
-			$array["message"]["data"] = "Fatal error !";
-		}else if($params['name']=="" || $params['email']=="" || $params['phone']=="" || $params['quation']==""){
-			$array["message"]["data"] = "All fields are required !";
-		}else if(sendEmail("info@bauinternational.edu.ge", "BAU (Bahcesehir University) BATUMI", $message, "info@bauinternational.edu.ge")){
-			$array["message"]["data"] = "Message sent successfully !";
-		}else{
-			$array["message"]["data"] = "Error !";
-		}
+    if(isset($_POST["type"]))
+    {
+        $type = $_POST["type"];
 
-		
-		echo json_encode($array);
-		exit();
-	}
+        switch ($type) {
+            case 'sendRequests':
+                $params = @$_POST;
+                if(
+                    $_SESSION["token"]!=$params["token"]
+                ){
+                    $errorCode = 1;
+                    $successCode = 0;
+                    $errorText = "Error";                   
+                    $successText = "";   
+                }else{
+                    $emailBody="";
 
+                    foreach ($params as $key => $value) {
+                        if($key=="type" || $key=="token"){ continue; }
+                        $emailBody .= sprintf("<strong>%s:</strong> <span>%s</span><br>", $key, $params[$key]);
+                    }
 
-	$url="";
-	$urlparts=array();
-	foreach($_GET as $k=>$v) {
-        if($k!='product')
-		  $urlparts[]=$k."=".$v;
-	}
-	if(count($urlparts)>0)
-		$url='?'.implode("&",$urlparts);
-    $product=NULL;
-    if(isset($_GET["product"])) 
-        $product=$_GET["product"];
-?>
-<!DOCTYPE html>
-<head>
-    <base href="<?php echo href(); ?>" />
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="google-site-verification" content="" />
-    <meta name="keywords" content="<?php echo s('keywords'); ?>" />
-    <meta name="description" content="<?php echo s('description'); ?>" />
-    <meta name="robots" content="Index, Follow" /> 
-    <meta name="author" content="" />
-<?php
-	$pagetitle = $storage->section['title'];
-	if(isset($_GET["product"])) {
-		$prod = db_fetch("select * from catalogs where language='".l()."' and id=".db_escape($_GET["product"]));
-		$pagetitle = $prod["title"];
-	}
-?>
-	<title><?php echo s('sitetitle').' - '. $pagetitle; ?></title>
-	<link type="text/css" media="all" rel="stylesheet" href="_website/css/general.css" />
-	<link type="text/css" media="all" rel="stylesheet" href="_website/css/<?php echo l();?>.css" />
-	<link type="text/css" media="screen" rel="stylesheet" href="<?php echo JAVASCRIPT;?>/prettyphoto/css/prettyPhoto.css" charset="utf-8" />
-    <link type="text/css" rel="stylesheet" href="<?php echo JAVASCRIPT;?>/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/custom.css" />
-	<script type="text/javascript" src="<?php echo JAVASCRIPT;?>/jquery/jquery-1.6.1.min.js"></script>
-    <script type="text/javascript" src="<?php echo JAVASCRIPT;?>/prettyphoto/js/jquery.prettyPhoto.js" charset="utf-8"></script>
-    <!--[if lt IE 9]>
-    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-</head>
-<body>
-	<?php echo html_decode($storage->content); ?>
-</body>
-</html>
+                    g_send_email(array(
+                        "sendTo"=>"giorgigvazava87@gmail.com",
+                        "subject"=>"Aims world congress 2020 - Registion",
+                        "body"=>$emailBody
+                    ));
+
+                    $errorCode = 0;
+                    $successCode = 1;
+                    $errorText = "";                   
+                    $successText = "Operation has been successfull"; 
+                }
+
+                $out = array(
+                    "Error" => array(
+                        "Code"=>$errorCode, 
+                        "Text"=>$errorText,
+                        "Details"=>""
+                    ),
+                    "Success"=>array(
+                        "Code"=>$successCode, 
+                        "Text"=>$successText,
+                        "Details"=>""
+                    )
+                );
+                break;
+        }
+    }
+
+    echo json_encode($out);
+    exit();

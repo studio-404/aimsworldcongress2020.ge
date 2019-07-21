@@ -65,7 +65,7 @@
     <meta property="og:site_name" content="<?php echo s('sitetitle').' - '.$pagetitle; ?>" />
     <meta property="og:type" content="website" />
 
-    <link href='http://fonts.googleapis.com/css?family=Raleway:400,100,200,300,500,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,100,200,300,500,600,700,800' rel='stylesheet' type='text/css'>
         
     <!-- CSS Bootstrap & Custom -->
     <link href="<?php echo WEBSITE;?>/bootstrap/css/bootstrap.css" rel="stylesheet" media="screen">
@@ -237,6 +237,7 @@
     <script src="<?php echo WEBSITE;?>/bootstrap/js/bootstrap.min.js"></script>
     <script src="<?php echo WEBSITE;?>/js/plugins.js"></script>
     <script src="<?php echo WEBSITE;?>/js/custom.js"></script>
+    <script src="<?php echo WEBSITE;?>/js/gscript.js"></script>
 
 </body>
 </html>

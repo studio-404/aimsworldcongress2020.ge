@@ -1973,3 +1973,55 @@ function random($length)
 	$bytes = openssl_random_pseudo_bytes($length * 2);
 	return substr(str_replace(array('/', '+', '='), '', base64_encode($bytes)), 0, $length);
 }
+
+function g_send_email($args){
+	if(file_exists("_plugins/PHPMailer/PHPMailerAutoload.php")){
+		require_once("_plugins/PHPMailer/PHPMailerAutoload.php");
+		
+		$out = false;	
+		$mail = new PHPMailer;
+		// $mail->SMTPDebug = 2; 
+		$SENDER_EMAIL = "noreply@aimsworldcongress2020.ge";
+		$SENDER_PASSWORD = "9Xyl(RcaC25V";
+
+		$mail->isSMTP(); 
+		$mail->CharSet = 'UTF-8';
+		$mail->Host = "aimsworldcongress2020.ge";
+		$mail->SMTPAuth = true;
+		$mail->Username = $SENDER_EMAIL;
+		$mail->Password = $SENDER_PASSWORD;
+		$mail->SMTPSecure = 'tls';
+		$mail->Port = 587;
+
+		$mail->setFrom($SENDER_EMAIL, "Aims world congress 2020");
+		$mail->addAddress($args["sendTo"]); 
+		$mail->addReplyTo($SENDER_EMAIL);
+		// $mail->addCC('cc@example.com');
+		// $mail->addBCC('bcc@example.com');
+
+		// if(isset($args['attachment'])){
+		// 	if(is_array($args['attachment'])){
+		// 		$i=1;
+		// 		foreach ($args['attachment'] as $attachment) {
+		// 			$attname = "attachment #".$i;
+		// 			$mail->addAttachment($attachment, $attname); 
+		// 			$i++;
+		// 		}
+		// 	}else{
+		// 		$mail->addAttachment($args['attachment'], "attachment"); 
+		// 	}
+		// }
+
+		$mail->isHTML(true);                                  
+
+		$mail->Subject = $args['subject'];
+		$mail->Body = $args['body'];
+		// $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+		if(!$mail->send()) {
+		    $out = false;
+		} else {
+		    $out = true;
+		}
+	}
+}
